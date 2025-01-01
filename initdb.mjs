@@ -1,7 +1,8 @@
 import sql from "better-sqlite3";
 const db = sql("training.db");
 
-db.exec(`
+function initDb() {
+  db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY,
     email TEXT UNIQUE,
@@ -9,14 +10,14 @@ db.exec(`
   );
 `);
 
-db.exec(`CREATE TABLE IF NOT EXISTS sessions (
+  db.exec(`CREATE TABLE IF NOT EXISTS sessions (
   id TEXT NOT NULL PRIMARY KEY,
   expires_at INTEGER NOT NULL,
   user_id TEXT NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id)
 )`);
 
-db.exec(`
+  db.exec(`
   CREATE TABLE IF NOT EXISTS trainings (
     id INTEGER PRIMARY KEY,
     title TEXT,
@@ -25,11 +26,11 @@ db.exec(`
   );
 `);
 
-const hasTrainings =
-  db.prepare("SELECT COUNT(*) as count FROM trainings").get().count > 0;
+  const hasTrainings =
+    db.prepare("SELECT COUNT(*) as count FROM trainings").get().count > 0;
 
-if (!hasTrainings) {
-  db.exec(`
+  if (!hasTrainings) {
+    db.exec(`
     INSERT INTO trainings (title, image, description)
     VALUES
     ('Yoga', '/yoga.jpg', 'A gentle way to improve flexibility and balance.'),
@@ -40,6 +41,9 @@ if (!hasTrainings) {
     ('Gaming', '/gaming.jpg', 'A fun way to improve hand-eye coordination and reflexes.'),
     ('Sailing', '/sailing.jpg', 'A relaxing way to enjoy the outdoors and improve balance.');
 `);
+  }
 }
+
+initDb();
 
 export default db;
