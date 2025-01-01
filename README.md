@@ -14,6 +14,12 @@ A comprehensive demonstration of Next.js 15's authentication using [Next Auth](h
    ```bash
    pnpm install
    ```
+
+2. Initialize the SQLite database:
+   ```bash
+   pnpm db:init
+   ```
+
 3. Authentication is using Next Auth. Set up the following environment variables:
 
    ```bash
