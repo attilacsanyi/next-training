@@ -30,4 +30,10 @@ A comprehensive demonstration of Next.js 15's authentication using [Next Auth](h
 
 ## Screenshots
 
-WIP
+TRaining Auth
+
+<img src="public/readme/next-training-auth.png" width="500" alt="Next Training Auth" />
+
+Training List (protected)
+
+<img src="public/readme/next-training-list.png" width="500" alt="Next Training list" />
