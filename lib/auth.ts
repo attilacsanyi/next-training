@@ -67,3 +67,16 @@ export const verifyAuthSession = async () => {
 const setSessionCookie = async ({ name, value, attributes }: Cookie) => {
   (await cookies()).set(name, value, attributes);
 };
+
+export const destroyAuthSession = async () => {
+  const { session } = await verifyAuthSession();
+  if (!session) {
+    return { error: "Unauthorized!" };
+  }
+
+  // Delete the session record from db
+  await lucia.invalidateSession(session.id);
+
+  // Clear the session cookie
+  await setSessionCookie(lucia.createBlankSessionCookie());
+};
