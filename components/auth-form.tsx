@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 
-import { signup, SignupActionState } from "@/actions/auth-actions";
+import { ActionState, auth, AuthMode } from "@/actions/auth-actions";
 import { useActionState } from "react";
 
-export const AuthForm = ({mode}: {mode: 'login' | 'signup'}) => {
-  const [{ errors }, formAction] = useActionState<SignupActionState, FormData>(
-    signup,
+export const AuthForm = ({mode}: {mode: AuthMode}) => {
+  const [{ errors }, formAction] = useActionState<ActionState, FormData>(
+    auth.bind(null, mode),
     {
       errors: { email: "", password: "" },
     }

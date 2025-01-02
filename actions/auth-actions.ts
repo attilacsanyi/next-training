@@ -1,18 +1,23 @@
 "use server";
 
 import { createAuthSession } from "@/lib/auth";
-import { hashUserPassword } from "@/lib/hash";
-import { createUser } from "@/lib/user-dao";
+import { hashUserPassword, verifyPassword } from "@/lib/hash";
+import { createUser, getUserByEmail } from "@/lib/user-dao";
 import { redirect } from "next/navigation";
 
-export type SignupActionState = {
-  errors?: { email?: string; password?: string };
+export type AuthMode = "signup" | "login";
+
+export type ActionState = {
+  errors?: {
+    email?: string;
+    password?: string;
+  };
 };
 
 export const signup = async (
-  prevState: SignupActionState,
+  prevState: ActionState,
   formData: FormData
-): Promise<SignupActionState> => {
+): Promise<ActionState> => {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
@@ -49,4 +54,40 @@ export const signup = async (
     }
     throw error;
   }
+};
+
+export const login = async (prevState: ActionState, formData: FormData) => {
+  const givenEmail = formData.get("email") as string;
+  const givenPassword = formData.get("password") as string;
+
+  const existingUser = getUserByEmail(givenEmail);
+  const authError =
+    "Couldn't authenticate user, please check your credentials.";
+  if (!existingUser) {
+    // User not found by email
+    return {
+      errors: {
+        email: authError,
+      },
+    };
+  }
+
+  if (!verifyPassword(existingUser.password, givenPassword)) {
+    // Password is incorrect
+    return { errors: { password: authError } };
+  }
+
+  await createAuthSession(existingUser.id.toString());
+  redirect("/training");
+};
+
+export const auth = async (
+  mode: AuthMode,
+  prevState: ActionState,
+  formData: FormData
+) => {
+  if (mode === "signup") {
+    return signup(prevState, formData);
+  }
+  return login(prevState, formData);
 };
