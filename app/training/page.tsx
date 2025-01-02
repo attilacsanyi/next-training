@@ -1,6 +1,13 @@
+import { verifyAuthSession } from '@/lib/auth';
 import { getTrainings } from '@/lib/training-dao';
+import { redirect } from 'next/navigation';
 
- const TrainingPage = async () => {
+const TrainingPage = async () => {
+  const { user } = await verifyAuthSession();
+  if (!user) {
+    return redirect('/');
+  }
+
   const trainingSessions = getTrainings();
 
   return (

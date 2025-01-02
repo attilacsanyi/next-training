@@ -37,7 +37,7 @@ export const signup = async (
   const hashedPassword = hashUserPassword(password);
   try {
     const newUserId = createUser(email, hashedPassword);
-    createAuthSession(newUserId.toString());
+    await createAuthSession(newUserId.toString());
     redirect("/training");
   } catch (error) {
     if (
