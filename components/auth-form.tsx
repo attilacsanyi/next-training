@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { ActionState, auth, AuthMode } from "@/actions/auth-actions";
+import Image from "next/image";
 import { useActionState } from "react";
 
 export const AuthForm = ({mode}: {mode: AuthMode}) => {
@@ -16,7 +17,7 @@ export const AuthForm = ({mode}: {mode: AuthMode}) => {
   return (
     <form id="auth-form" action={formAction}>
       <div>
-        <img src="/images/auth-icon.jpg" alt="A lock icon" />
+        <Image src="/images/auth-icon.jpg" alt="A lock icon" width={200} height={200} />
       </div>
       <p>
         <label htmlFor="email">Email</label>

@@ -1,5 +1,6 @@
 import { verifyAuthSession } from '@/lib/auth';
 import { getTrainings } from '@/lib/training-dao';
+import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
 const TrainingPage = async () => {
@@ -16,7 +17,7 @@ const TrainingPage = async () => {
       <ul id="training-sessions">
         {trainingSessions.map((training) => (
           <li key={training.id}>
-            <img src={`/trainings/${training.image}`} alt={training.title} />
+            <Image src={`/trainings${training.image}`} alt={training.title} width={200} height={200} />
             <div>
               <h2>{training.title}</h2>
               <p>{training.description}</p>
