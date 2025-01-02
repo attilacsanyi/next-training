@@ -10,7 +10,9 @@
     "db:init": "node initdb.mjs"
   },
   "dependencies": {
+    "@lucia-auth/adapter-sqlite": "3.0.2",
     "better-sqlite3": "11.7.0",
+    "lucia": "3.2.2",
     "next": "15.1.3",
     "react": "19.0.0",
     "react-dom": "19.0.0"

@@ -1,5 +1,6 @@
 "use server";
 
+import { createAuthSession } from "@/lib/auth";
 import { hashUserPassword } from "@/lib/hash";
 import { createUser } from "@/lib/user-dao";
 import { redirect } from "next/navigation";
@@ -34,9 +35,10 @@ export const signup = async (
   }
 
   const hashedPassword = hashUserPassword(password);
-
   try {
-    createUser(email, hashedPassword);
+    const newUserId = createUser(email, hashedPassword);
+    createAuthSession(newUserId.toString());
+    redirect("/training");
   } catch (error) {
     if (
       error instanceof Error &&
@@ -47,6 +49,4 @@ export const signup = async (
     }
     throw error;
   }
-
-  redirect("/training");
 };
