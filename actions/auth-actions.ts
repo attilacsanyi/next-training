@@ -2,6 +2,7 @@
 
 import { hashUserPassword } from "@/lib/hash";
 import { createUser } from "@/lib/user-dao";
+import { redirect } from "next/navigation";
 
 export type SignupActionState = {
   errors?: { email?: string; password?: string };
@@ -34,7 +35,18 @@ export const signup = async (
 
   const hashedPassword = hashUserPassword(password);
 
-  createUser(email, hashedPassword);
+  try {
+    createUser(email, hashedPassword);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      "code" in error &&
+      error.code === "SQLITE_CONSTRAINT_UNIQUE"
+    ) {
+      return { errors: { email: "Email already exists!" } };
+    }
+    throw error;
+  }
 
-  return { errors: undefined };
+  redirect("/training");
 };
