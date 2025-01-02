@@ -1,5 +1,8 @@
 "use server";
 
+import { hashUserPassword } from "@/lib/hash";
+import { createUser } from "@/lib/user-dao";
+
 export type SignupActionState = {
   errors?: { email?: string; password?: string };
 };
@@ -28,6 +31,10 @@ export const signup = async (
   if (Object.keys(errors).length > 0) {
     return { errors };
   }
+
+  const hashedPassword = hashUserPassword(password);
+
+  createUser(email, hashedPassword);
 
   return { errors: undefined };
 };
