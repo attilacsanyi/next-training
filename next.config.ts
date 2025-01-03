@@ -8,22 +8,25 @@ type Envs = {
   ENV: string;
 };
 
-const nextConfig = (phase: string, config: NextConfig): NextConfig => {
+const nextConfig = (
+  phase: string,
+  { defaultConfig }: { defaultConfig: NextConfig }
+): NextConfig => {
   if (phase === PHASE_DEVELOPMENT_SERVER) {
-    config.env = {
-      ...config.env,
+    defaultConfig.env = {
+      ...defaultConfig.env,
       ENV: "development",
     } satisfies Envs;
   }
 
   if (phase === PHASE_PRODUCTION_BUILD) {
-    config.env = {
-      ...config.env,
+    defaultConfig.env = {
+      ...defaultConfig.env,
       ENV: "production",
     } satisfies Envs;
   }
 
-  return config;
+  return defaultConfig;
 };
 
 export default nextConfig;
