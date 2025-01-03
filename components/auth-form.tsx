@@ -6,7 +6,7 @@ import { ActionState, auth, AuthMode } from "@/actions/auth-actions";
 import Image from "next/image";
 import { useActionState } from "react";
 
-export const AuthForm = ({mode}: {mode: AuthMode}) => {
+export const AuthForm = ({ mode }: { mode: AuthMode }) => {
   const [{ errors }, formAction] = useActionState<ActionState, FormData>(
     auth.bind(null, mode),
     {
@@ -17,7 +17,12 @@ export const AuthForm = ({mode}: {mode: AuthMode}) => {
   return (
     <form id="auth-form" action={formAction}>
       <div>
-        <Image src="/images/auth-icon.jpg" alt="A lock icon" width={200} height={200} />
+        <Image
+          src="/images/auth-icon.jpg"
+          alt="A lock icon"
+          width={200}
+          height={200}
+        />
       </div>
       <p>
         <label htmlFor="email">Email</label>
@@ -35,11 +40,17 @@ export const AuthForm = ({mode}: {mode: AuthMode}) => {
         </ul>
       )}
       <p>
-        <button type="submit">{mode === 'login' ? 'Login' : 'Create Account'}</button>
+        <button type="submit">
+          {mode === "login" ? "Login" : "Create Account"}
+        </button>
       </p>
       <p>
-        {mode === 'login' && <Link href="/?mode=signup">Create an account.</Link>}
-        {mode === 'signup' && <Link href="/?mode=login">Login with existing account.</Link>}
+        {mode === "login" && (
+          <Link href="/?mode=signup">Create an account.</Link>
+        )}
+        {mode === "signup" && (
+          <Link href="/?mode=login">Login with existing account.</Link>
+        )}
       </p>
     </form>
   );
