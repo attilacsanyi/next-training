@@ -1,43 +1,40 @@
 "use server";
 
 import { createAuthSession, destroyAuthSession } from "@/lib/auth";
+import {
+  LoginForm,
+  LoginFormSchema,
+  SignupForm,
+  SignupFormSchema,
+} from "@/lib/definitions";
 import { hashUserPassword, verifyPassword } from "@/lib/hash";
 import { createUser, getUserByEmail } from "@/lib/user-dao";
 import { redirect } from "next/navigation";
 
 export type AuthMode = "signup" | "login";
 
-export type ActionState = {
-  errors?: {
-    email?: string;
-    password?: string;
-  };
-};
+export type SignupFormState =
+  | { errors?: { [key in keyof SignupForm]?: string[] } }
+  | undefined;
+
+export type LoginFormState =
+  | { errors?: { [key in keyof LoginForm]?: string[] } }
+  | undefined;
 
 export const signup = async (
-  prevState: ActionState,
+  prevState: SignupFormState,
   formData: FormData
-): Promise<ActionState> => {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+): Promise<SignupFormState> => {
+  const validatedFields = SignupFormSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
 
-  const errors: typeof prevState.errors = {};
-
-  if (!email || !password) {
-    errors.email = "Email and password are required";
+  if (!validatedFields.success) {
+    return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
-  if (!email.includes("@")) {
-    errors.email = "Email must contain an @ symbol";
-  }
-
-  if (password.trim().length < 8) {
-    errors.password = "Password must be at least 8 characters";
-  }
-
-  if (Object.keys(errors).length > 0) {
-    return { errors };
-  }
+  const { email, password } = validatedFields.data;
 
   const hashedPassword = hashUserPassword(password);
   try {
@@ -50,31 +47,42 @@ export const signup = async (
       "code" in error &&
       error.code === "SQLITE_CONSTRAINT_UNIQUE"
     ) {
-      return { errors: { email: "Email already exists!" } };
+      return { errors: { email: ["Email already exists!"] } };
     }
     throw error;
   }
 };
 
-export const login = async (prevState: ActionState, formData: FormData) => {
-  const givenEmail = formData.get("email") as string;
-  const givenPassword = formData.get("password") as string;
+export const login = async (
+  prevState: LoginFormState,
+  formData: FormData
+): Promise<LoginFormState> => {
+  const validatedFields = LoginFormSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
 
-  const existingUser = getUserByEmail(givenEmail);
+  if (!validatedFields.success) {
+    return { errors: validatedFields.error.flatten().fieldErrors };
+  }
+
+  const { email, password } = validatedFields.data;
+
+  const existingUser = getUserByEmail(email);
   const authError =
     "Couldn't authenticate user, please check your credentials.";
   if (!existingUser) {
     // User not found by email
     return {
       errors: {
-        email: authError,
+        email: [authError],
       },
     };
   }
 
-  if (!verifyPassword(existingUser.password, givenPassword)) {
+  if (!verifyPassword(existingUser.password, password)) {
     // Password is incorrect
-    return { errors: { password: authError } };
+    return { errors: { password: [authError] } };
   }
 
   await createAuthSession(existingUser.id.toString());
@@ -83,7 +91,7 @@ export const login = async (prevState: ActionState, formData: FormData) => {
 
 export const auth = async (
   mode: AuthMode,
-  prevState: ActionState,
+  prevState: SignupFormState | LoginFormState,
   formData: FormData
 ) => {
   if (mode === "signup") {
